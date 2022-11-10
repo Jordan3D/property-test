@@ -1,12 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Header from './Header';
-import PropertyCard from './PropertyCard';
+import List from './List';
+
+const DEBOUNCE_MS = 1000;
 
 function App() {
-  const [properties, setProperties] = useState();
+  const [searchValue, setSearchValue] = useState('');
+  const [properties, setProperties] = useState([]);
+  const valueRef = useRef(null);
 
-  // use this state to keep track of the user's saved/bookmarked properties
-  const [savedProperties, setSavedProperties] = useState([]);
+  const onChangeValue = useCallback((e) => {
+    valueRef.current = e.target.value;
+    setTimeout(() => {
+      if (valueRef.current === e.target.value) {
+        setSearchValue(valueRef.current);
+      }
+    }, DEBOUNCE_MS);
+  }, [setSearchValue]);
 
   useEffect(() => {
     const fetchPropertyData = async () => {
@@ -20,12 +30,9 @@ function App() {
   }, []);
 
   return (
-    <div className="container mx-auto my-5">
-      <Header />
-
-      <div className="grid grid-cols-1 gap-4 mt-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {!!properties && properties.map((property) => <PropertyCard key={property.property_id} property={property} />)}
-      </div>
+    <div className="container mx-auto h-screen p-4 flex flex-col">
+      <Header onChange={onChangeValue} />
+      <List properties={properties} searchValue={searchValue}/>
     </div>
   );
 }

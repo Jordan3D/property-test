@@ -1,23 +1,33 @@
+import { memo } from 'react';
 import { FaBookmark } from 'react-icons/fa';
 
-function PropertyCard({ property }) {
-  return (
-    <div className="border-2 bg-gray-50">
-      <div className="relative">
-        <img src={`https://mr0.homeflow.co.uk/${property.photos[0]}`} alt={property.display_address} />
+const PropertyCard = memo(({ property, isSaved, toggleBoomark }) => {
+  const { photos, price, display_address, property_id } = property;
+  const mainPhoto = photos && photos.length ? photos[0] : undefined;
 
-        <button className="absolute top-0 right-2" title="Click to bookmark this property">
-          <FaBookmark className="text-yellow-400" size="40" />
+  const color = isSaved ? 'red' : 'yellow'
+
+  return (
+    <div className="border-2 bg-gray-50 flex flex-col">
+      <div className="relative grow">
+        {
+          mainPhoto ?
+            <img src={`https://mr0.homeflow.co.uk/${mainPhoto}`} alt={display_address} /> :
+            <div className="flex text-base grow justify-center items-center h-full text-lg text-stone-500">No Photo</div>
+        }
+
+        <button className="absolute top-0 right-2" title="Click to bookmark this property" onClick={toggleBoomark(property_id)}>
+          <FaBookmark className={`text-${color}-400`} size="40" />
         </button>
 
-        <p className="absolute bottom-0 right-0 px-2 py-1 border-t border-l bg-gray-50">{property.price}</p>
+        <p className="absolute bottom-0 right-0 px-2 py-1 border-t border-l bg-gray-50">{price}</p>
       </div>
 
       <div className="px-3 py-2">
-        <p>{property.display_address}</p>
+        <p>{display_address}</p>
       </div>
     </div>
   );
-};
+});
 
 export default PropertyCard;
